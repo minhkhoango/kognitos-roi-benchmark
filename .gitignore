@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+celerybeat-schedule
+*.so
+
+# Database
+results.db
+*.sqlite3
+
+# IDEs and Caches
+.vscode/
+.idea/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Data
+data/

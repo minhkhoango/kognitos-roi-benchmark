@@ -1,0 +1,54 @@
+# pyproject.toml
+# Defines project metadata, dependencies, and tool configurations.
+
+[tool.poetry]
+name = "kognitos-battering-ram"
+version = "0.1.0"
+description = "12-hour sprint to demo Kognitos ROI."
+authors = ["Kai <kai@builder.ai>"]
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pandas = "^2.2.2"
+# python-dotenv is good practice, though not strictly used in this version
+# to keep it self-contained.
+python-dotenv = "^1.0.1" 
+
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.10.0"
+pytest = "^8.2.0"
+ruff = "^0.4.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+# Configuration for the MyPy type checker.
+# We aim for the strictest possible checks.
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_any_unimported = true
+no_implicit_optional = true
+check_untyped_defs = true
+strict = true
+
+# Configuration for the Ruff linter.
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
