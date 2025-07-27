@@ -28,7 +28,7 @@ MIN_IN_A_HOUR: int = 60
 
 # --- Random Seed Configuration ---
 # Set to None for non-reproducible results, or an integer for reproducible results
-_random_seed: Optional[int] = None
+_random_seed: Optional[int] = 42
 
 def set_random_seed(seed: Optional[int] = None) -> None:
     """
@@ -44,8 +44,7 @@ def set_random_seed(seed: Optional[int] = None) -> None:
         print(f"Random seed set to {seed} for reproducible results")
 
 # Initialize seed if specified
-if _random_seed is not None:
-    set_random_seed(_random_seed)
+set_random_seed(_random_seed)
 
 # --- Type Definitions ---
 class ProcessingResult(TypedDict):

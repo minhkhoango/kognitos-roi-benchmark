@@ -17,7 +17,7 @@ VENDORS: List[str] = ["Stark Industries", "Wayne Enterprises", "Cyberdyne System
 
 # --- Random Seed Configuration ---
 # Set to None for non-reproducible results, or an integer for reproducible results
-_random_seed: Optional[int] = None
+_random_seed: Optional[int] = 42
 
 def set_random_seed(seed: Optional[int] = None) -> None:
     """
@@ -32,9 +32,8 @@ def set_random_seed(seed: Optional[int] = None) -> None:
         random.seed(seed)
         print(f"Random seed set to {seed} for reproducible invoice generation")
 
-# Initialize seed if specified
-if _random_seed is not None:
-    set_random_seed(_random_seed)
+# Initialize seed
+set_random_seed(_random_seed)
 # --- End Configuration ---
 
 def create_invoice_data(is_monster: bool) -> Dict[str, Any]:

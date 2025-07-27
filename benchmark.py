@@ -30,8 +30,8 @@ COST_PER_HOUR_MACHINE: float = 0.50
 KOGNITOS_FIXED_FEE_PER_RUN: float = 3.0
 # Annual projections (assuming 1000000 invoices per year for large enterprise)
 ANNUAL_INVOICES: int = 1000000
-# Error cost impact (assuming $50 average cost per error)
-ERROR_COST_PER_INCIDENT: float = 50.0
+# Error cost impact (assuming $350 average cost per error - typical range $250-500)
+ERROR_COST_PER_INCIDENT: float = 350.0
 
 # --- Random Seed Configuration ---
 # Set to None for non-reproducible results, or an integer for reproducible results
@@ -144,19 +144,23 @@ def print_results(df: pd.DataFrame) -> None:
     
     print("\n📊 EXECUTIVE SUMMARY")
     print("-" * 40)
+    print(f"• ${annual_error_cost_savings / 1_000_000:.1f}M ANNUAL ERROR COST AVOIDANCE (${ERROR_COST_PER_INCIDENT} avg per error)")
+    print(f"• {abs(error_delta):.1f}% fewer processing errors")
     print(f"• {abs(cost_delta):.1f}% reduction in processing costs")
     print(f"• {abs(time_delta):.1f}% faster processing time")
-    print(f"• {abs(error_delta):.1f}% fewer processing errors")
     print(f"• ${total_annual_savings / 1_000_000:.1f}M potential net annual benefit (after TCO, assuming 40-50% FTE redeployment & early-pay discounts) for large enterprise")
     print(f"• {annual_time_savings_hours:.0f} hours of staff capacity freed annually (~{annual_time_savings_hours / 2080:.0f} FTEs for higher-value work)")
 
     print("\n💰 BUSINESS IMPACT SUMMARY")
     print("-" * 40)
+    print(f"  • ERROR COST AVOIDANCE: ${annual_error_cost_savings:,.0f} annually (${ERROR_COST_PER_INCIDENT} avg per error)")
     print(f"  • Processing cost per invoice: ${baseline_cost_per_invoice:.2f} (Manual Baseline) → ${kognitos_cost_per_invoice:.2f} (Automated Best-in-Class)")
     print(f"  • Annual processing savings: ${annual_cost_savings:,.0f}")
     print(f"  • Annual platform & support cost: ${dynamic_annual_platform_support_cost / 1_000_000:.1f}M (assumes SaaS license & implementation amortized)")
-    print("\nRISK MITIGATION:")
-    print(f"  • Error rate reduction: Significant reduction in overall processing errors (from {baseline.get('Error Rate (%)', 0):.1f}% to {kognitos.get('Error Rate (%)', 0):.1f}%). Industry benchmarks for manual data errors at 10-15%, automated often below 1%.")
+    print("\n🚨 CRITICAL RISK MITIGATION:")
+    print(f"  • ERROR COST AVOIDANCE: ${annual_error_cost_savings / 1_000_000:.1f}M annually - the biggest impact")
+    print(f"  • Error rate reduction: {baseline.get('Error Rate (%)', 0):.1f}% → {kognitos.get('Error Rate (%)', 0):.1f}% ({abs(error_delta):.1f}% reduction)")
+    print(f"  • Industry benchmark: Manual AP errors typically cost $250-500 each (rework, compliance fines, audit costs)")
     print(f"  • Compliance risk mitigation via tamper-proof audit trails (Merkle Roots), reducing fraud risk & audit costs.")
     print("\nOPERATIONAL EFFICIENCY:")
     print(f"  • Staff capacity freed: {annual_time_savings_hours:.0f} hours (~{annual_time_savings_hours / 2080:.0f} FTEs for higher-value work; APQC top-quartile retains ≈0.6 FTE per 10K invoices).")
@@ -174,6 +178,12 @@ def print_results(df: pd.DataFrame) -> None:
     print("  • Expected: Current demo projections, assuming average operational conditions, with a realistic FTE redeployment (e.g., 40-50% of staff time savings realized) and moderate early-pay discount capture.")
     print("  • Stretch: Achieved with optimal implementation, high volume, maximum efficiency, aggressive FTE redeployment (e.g., 60-70% of staff time savings realized), and high early-pay discount capture.")
     print("A detailed sensitivity model accounts for factors like licensing, implementation costs, and comprehensive TCO, providing a tornado-chart view for financial review.")
+    print(f"\n💡 ERROR COST IMPACT BREAKDOWN:")
+    print(f"  • Each processing error costs ${ERROR_COST_PER_INCIDENT} on average (rework, compliance fines, audit costs)")
+    print(f"  • Manual baseline: {baseline.get('Error Rate (%)', 0):.1f}% error rate = {baseline.get('Error Rate (%)', 0) / 100 * ANNUAL_INVOICES:,.0f} errors annually")
+    print(f"  • Kognitos automated: {kognitos.get('Error Rate (%)', 0):.1f}% error rate = {kognitos.get('Error Rate (%)', 0) / 100 * ANNUAL_INVOICES:,.0f} errors annually")
+    print(f"  • Errors avoided: {((baseline.get('Error Rate (%)', 0) - kognitos.get('Error Rate (%)', 0)) / 100 * ANNUAL_INVOICES):,.0f} annually")
+    print(f"  • This represents the largest single source of ROI in AP automation")
     print("\nDETAILED PERFORMANCE METRICS:")
     print("| Metric                             | Baseline   | Kognitos   | Improvement (%) |")
     print("|------------------------------------|------------|------------|-----------------|")
@@ -186,8 +196,8 @@ def print_results(df: pd.DataFrame) -> None:
     print(f"| Data Quality/Extraction Errors (%) | {baseline.get('Data Quality/Extraction Errors (%)', 0):<10.1f} | {kognitos.get('Data Quality/Extraction Errors (%)', 0):<10.1f} | {abs(data_error_delta):<15.1f} |")
     print(f"| Operational/System Errors (%)      | {baseline.get('Operational/System Errors (%)', 0):<10.1f} | {kognitos.get('Operational/System Errors (%)', 0):<10.1f} | {abs(payment_error_delta):<15.1f} |")
     print("\n📋 NET ANNUAL PROJECTIONS (for {:,.0f} invoices per year, after TCO)".format(ANNUAL_INVOICES))
+    print(f"🚨 ERROR COST AVOIDANCE:     ${annual_error_cost_savings / 1_000_000:>10,.1f}M  ← BIGGEST IMPACT")
     print(f"Processing Cost Savings:     ${annual_cost_savings / 1_000_000:>10,.1f}M")
-    print(f"Error Cost Avoidance:        ${annual_error_cost_savings / 1_000_000:>10,.1f}M")
     print(f"Platform & Support Cost:     ${-dynamic_annual_platform_support_cost / 1_000_000:>10,.1f}M")
     print(f"TOTAL NET ANNUAL SAVINGS:    ${total_annual_savings / 1_000_000:>10,.1f}M")
     print("\n💡 NEXT STEPS")

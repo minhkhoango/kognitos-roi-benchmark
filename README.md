@@ -1,4 +1,4 @@
-# Kognitos ROI Demo: 59.3% Cost Reduction, 83.6% Faster Processing
+# Kognitos ROI Demo: 60.0% Cost Reduction, 83.9% Faster Processing
 
 ## 🚀 Run the Demo
 
@@ -10,21 +10,22 @@ make demo
 
 | Metric                             | Baseline   | Kognitos   | Improvement |
 |-----------------------------------|------------|------------|-------------|
-| **Cost per Invoice**               | $7.41      | $3.02      | **59.3%**   |
-| **Processing Time**                | 12.98 mins | 2.13 mins  | **83.6%**   |
-| **Error Rate**                     | 10.3%      | 2.3%       | **77.3%**   |
+| **🚨 Error Rate**                  | 9.9%       | 2.7%       | **72.7%**   |
+| **Cost per Invoice**               | $7.55      | $3.02      | **60.0%**   |
+| **Processing Time**                | 13.31 mins | 2.15 mins  | **83.9%**   |
 | **End-to-end Cycle Time (days)**   | 10.0       | 3.5        | **65.0%**   |
-| **Data Quality/Extraction Errors (%)** | 9.3%      | 1.8%       | **80.6%**   |
-| **Operational/System Errors (%)**  | 1.0%       | 0.5%       | **46.7%**   |
-| **Annual Savings**                 | -          | Variable (see report) | Variable |
+| **Data Quality/Extraction Errors (%)** | 8.8%      | 2.1%       | **76.1%**   |
+| **Operational/System Errors (%)**  | 1.1%       | 0.6%       | **45.5%**   |
+| **Annual Savings**                 | -          | $29.0M (see report) | $29.0M |
 
 ## 💰 The Business Case
 
 **Transform AP operations with English-as-code automation:**
 
-• **59.3% cost reduction** with consumption-based pricing  
-• **83.6% faster processing** with neurosymbolic AI  
-• **77.3% fewer errors** with self-healing workflows  
+• **🚨 $25.2M annual error cost avoidance** ($350 avg per error)  
+• **72.7% fewer errors** with self-healing workflows  
+• **60.0% cost reduction** with consumption-based pricing  
+• **83.9% faster processing** with neurosymbolic AI
 • **Zero hallucinations** – verifiable results for increased trust and compliance.  
 • **Tamper-proof audit trails** for bulletproof governance.  
 
