@@ -36,7 +36,6 @@ def init_db() -> None:
                 schema_sql = f.read()
             con.executescript(schema_sql)
             con.commit()
-            print(f"Database initialized at {DB_PATH}")
         except sqlite3.Error as e:
             print(f"Error initializing database: {e}")
             raise
@@ -52,6 +51,7 @@ def log_run(
     status: str,
     error_details: Optional[str],
     merkle_root: Optional[str],
+    error_type: Optional[str],
 ) -> None:
     """
     Logs the results of a single processing run to the database.
@@ -59,8 +59,8 @@ def log_run(
     sql = """
         INSERT INTO runs (
             run_id, run_type, invoice_id, ts_start, ts_end, 
-            cycle_time_s, cost_usd, status, error_details, merkle_root
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            cycle_time_s, cost_usd, status, error_details, merkle_root, error_type
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
     with get_db_connection() as con:
         try:
@@ -77,6 +77,7 @@ def log_run(
                     status,
                     error_details,
                     merkle_root,
+                    error_type,
                 ),
             )
             con.commit()

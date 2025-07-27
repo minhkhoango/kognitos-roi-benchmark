@@ -27,5 +27,8 @@ CREATE TABLE IF NOT EXISTS runs (
     error_details TEXT,
 
     -- For 'kognitos' runs, this stores the immutable SHA-256 audit seal.
-    merkle_root TEXT
+    merkle_root TEXT,
+
+    -- Error categorization: 'data_quality', 'system_processing', or other specific types
+    error_type TEXT
 );

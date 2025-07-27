@@ -7,13 +7,34 @@ import csv
 import random
 import uuid
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 # --- Configuration ---
-TOTAL_INVOICES: int = 50
-MONSTER_INVOICE_PERCENTAGE: float = 0.20  # 20% of invoices will be monsters
+TOTAL_INVOICES: int = 1000
+MONSTER_INVOICE_PERCENTAGE: float = 0.15  # 15% of invoices will be monsters
 DATA_DIR: Path = Path("data")
 VENDORS: List[str] = ["Stark Industries", "Wayne Enterprises", "Cyberdyne Systems", "Acme Corp", "Soylent Corp"]
+
+# --- Random Seed Configuration ---
+# Set to None for non-reproducible results, or an integer for reproducible results
+_random_seed: Optional[int] = None
+
+def set_random_seed(seed: Optional[int] = None) -> None:
+    """
+    Set the random seed for reproducible results.
+    
+    Args:
+        seed: Integer seed value, or None for non-reproducible results
+    """
+    global _random_seed
+    _random_seed = seed
+    if seed is not None:
+        random.seed(seed)
+        print(f"Random seed set to {seed} for reproducible invoice generation")
+
+# Initialize seed if specified
+if _random_seed is not None:
+    set_random_seed(_random_seed)
 # --- End Configuration ---
 
 def create_invoice_data(is_monster: bool) -> Dict[str, Any]:
@@ -39,7 +60,15 @@ def create_invoice_data(is_monster: bool) -> Dict[str, Any]:
 
     if is_monster:
         # Introduce chaos
-        chaos_type = random.choice(["missing_id", "bad_date", "negative_qty", "extra_col"])
+        chaos_type = random.choice([
+            "missing_id",
+            "bad_date",
+            "negative_qty",
+            "extra_col",
+            "mismatched_total",
+            "missing_line_item",
+            "invalid_char_in_numeric"
+        ])
         
         if chaos_type == "missing_id":
             data["invoice_id"] = ""  # Missing ID
@@ -50,6 +79,13 @@ def create_invoice_data(is_monster: bool) -> Dict[str, Any]:
             data["total"] = -abs(total)
         elif chaos_type == "extra_col":
             data["notes"] = "Urgent payment required" # Extra column
+        elif chaos_type == "mismatched_total":
+            data["total"] = round(total * random.uniform(0.8, 1.2), 2)
+        elif chaos_type == "missing_line_item":
+            to_remove = random.choice(["quantity", "unit_price"])
+            data.pop(to_remove, None)
+        elif chaos_type == "invalid_char_in_numeric":
+            data["total"] = f"{total} USD"
 
     return data
 
@@ -80,8 +116,6 @@ def main() -> None:
         except IOError as e:
             print(f"Error writing file {file_path}: {e}")
             continue
-    
-    print(f"Generated {TOTAL_INVOICES} invoices ({num_monsters} monsters) in '{DATA_DIR}/'")
 
 
 if __name__ == "__main__":
