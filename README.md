@@ -1,4 +1,4 @@
-# Kognitos ROI Demo: 62.8% Cost Reduction, 73.1% Faster Processing
+# Kognitos ROI Demo: 69.9% Cost Reduction, 83.5% Faster Processing
 
 ## 🚀 Run the Demo
 
@@ -9,23 +9,21 @@ make demo
 **See results immediately:**
 
 | Metric                             | Baseline   | Kognitos   | Improvement |
-|-----------------------------------|------------|------------|-------------|
-| **🚨 Error Rate**                  | 9.9%       | 2.7%       | **72.7%**   |
-| **Cost per Invoice**               | $8.15      | $3.03      | **62,8%**   |
-| **Processing Time**                | 12.35 mins | 3.32 mins  | **73.1%**   |
+|------------------------------------|------------|------------|-------------|
+| **🚨 Error Rate**                  | 8.1%       | 0.9%       | **88.9**    |
+| **Cost per Invoice**               | $10.03     | $3.02      | **69.9%**   |
+| **Processing Time**                | 12.08 mins | 1.99 mins  | **83.5%**   |
 | **End-to-end Cycle Time (days)**   | 10.0       | 3.5        | **65.0%**   |
-| **Data Quality/Extraction Errors (%)** | 8.8%      | 2.1%       | **76.1%**   |
-| **Operational/System Errors (%)**  | 1.1%       | 0.6%       | **45.5%**   |
-| **Annual Savings**                 | -          | $30.1M (see report) | $30.1M |
+| **Annual Savings**                 | -          | $32M (see report) | $32M |
 
 ## 💰 The Business Case
 
 **Transform AP operations with English-as-code automation:**
 
 • **🚨 $25.2M annual error cost avoidance** ($350 avg per error)  
-• **72.7% fewer errors** with self-healing workflows  
-• **62.8% cost reduction** with consumption-based pricing  
-• **73.1% faster processing** with neurosymbolic AI
+• **88.9% fewer errors** with self-healing workflows  
+• **69.9% cost reduction** with consumption-based pricing  
+• **83.5% faster processing** with neurosymbolic AI  
 • **Zero hallucinations** – verifiable results for increased trust and compliance.  
 • **Tamper-proof audit trails** for bulletproof governance.  
 

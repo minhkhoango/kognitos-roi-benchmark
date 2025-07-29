@@ -152,7 +152,7 @@ def print_results(df: pd.DataFrame) -> None:
     print(f"  • Platform & support cost: ${dynamic_annual_platform_support_cost / 1_000_000:.2f}M")
 
     print("\nCYCLE TIME IMPACT:")
-    baseline_calendar_days: float = 10.0
+    baseline_calendar_days: float = 10.0 # These numbers depends on the bussiness, hard to simulate 
     kognitos_calendar_days: float = 3.5
     calendar_days_delta: float = ((kognitos_calendar_days - baseline_calendar_days) / baseline_calendar_days) * 100
     print(f"  • Cycle time: {baseline_calendar_days:.1f} days → {kognitos_calendar_days:.1f} days ({abs(calendar_days_delta):.1f}% faster)")

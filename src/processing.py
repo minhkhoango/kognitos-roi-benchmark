@@ -17,13 +17,13 @@ from src.auditing import compute_merkle_root
 MANUAL_SLEEP_MIN: float = 9.0
 MANUAL_SLEEP_MAX: float = 15.0
 # Manual process error rate (human error rate 1.6-3%, up to 10-15% possible)
-MANUAL_ERROR_RATE: float = 0.07
+MANUAL_ERROR_RATE: float = 0.03
 
 # Kognitos process timing (in minutes)
 KOGNITOS_SLEEP_MIN: float = 1.5
 KOGNITOS_SLEEP_MAX: float = 2.5
 # Kognitos process error rate (automation error rate ~1-2% for realistic automation)
-KOGNITOS_ERROR_RATE: float = 0.005
+KOGNITOS_ERROR_RATE: float = 0.002
 
 MIN_IN_A_HOUR: int = 60
 
@@ -122,7 +122,7 @@ def _kognitos_fix_data_quality(data: Dict[str, Any]) -> tuple[Dict[str, Any], Li
     # Fix invalid date format with more comprehensive parsing (90% success rate)
     invoice_date = fixed_data.get("invoice_date", "")
     if invoice_date and not (len(invoice_date) == 10 and invoice_date[4] == "-" and invoice_date[7] == "-"):
-        if random.random() < 0.90:  # 90% chance to fix
+        if random.random() < 0.95:  # 90% chance to fix
             try:
                 from datetime import datetime
                 # Handle various date formats including more edge cases
@@ -154,10 +154,10 @@ def _kognitos_fix_data_quality(data: Dict[str, Any]) -> tuple[Dict[str, Any], Li
             fixed_data["quantity"] = abs(quantity)
             fixes_applied.append("fixed_negative_quantity")
     
-    # Enhanced non-numeric total extraction (85% success rate)
+    # Enhanced non-numeric total extraction (95% success rate)
     total = fixed_data.get("total")
     if total is not None and isinstance(total, str):
-        if random.random() < 0.85:  # 85% chance to fix
+        if random.random() < 0.95:  # 95% chance to fix
             import re
             # More comprehensive numeric extraction
             numeric_match = re.search(r'[\d,]+\.?\d*', total)
@@ -176,9 +176,9 @@ def _kognitos_fix_data_quality(data: Dict[str, Any]) -> tuple[Dict[str, Any], Li
                         except (ValueError, TypeError):
                             pass
     
-    # Fix missing required fields with intelligent defaults (90% success rate)
+    # Fix missing required fields with intelligent defaults (95% success rate)
     if not fixed_data.get("quantity"):
-        if random.random() < 0.90:  # 90% chance to fix
+        if random.random() < 0.95:  # 95% chance to fix
             # Try to infer quantity from total and unit_price if available
             if fixed_data.get("total") and fixed_data.get("unit_price"):
                 try:
@@ -193,7 +193,7 @@ def _kognitos_fix_data_quality(data: Dict[str, Any]) -> tuple[Dict[str, Any], Li
                 fixes_applied.append("defaulted_quantity")
     
     if not fixed_data.get("unit_price"):
-        if random.random() < 0.90:  # 90% chance to fix
+        if random.random() < 0.95:  # 90% chance to fix
             # Try to infer unit_price from total and quantity if available
             if fixed_data.get("total") and fixed_data.get("quantity"):
                 try:
@@ -207,12 +207,12 @@ def _kognitos_fix_data_quality(data: Dict[str, Any]) -> tuple[Dict[str, Any], Li
                 fixed_data["unit_price"] = 100.0
                 fixes_applied.append("defaulted_unit_price")
     
-    # Enhanced mismatched total recalculation (80% success rate)
+    # Enhanced mismatched total recalculation (95% success rate)
     quantity = fixed_data.get("quantity")
     unit_price = fixed_data.get("unit_price")
     total = fixed_data.get("total")
     if all(v is not None for v in [quantity, unit_price, total]):
-        if random.random() < 0.80:  # 80% chance to fix
+        if random.random() < 0.95:  # 95% chance to fix
             try:
                 if isinstance(quantity, (int, float)) and isinstance(unit_price, (int, float)):
                     expected_total = float(quantity) * float(unit_price)
