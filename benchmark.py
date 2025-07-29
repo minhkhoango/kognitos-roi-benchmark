@@ -7,7 +7,6 @@
 # 4. Queries the database to calculate aggregate KPIs.
 # 5. Prints a final, formatted Markdown report to the console.
 
-import time
 import uuid
 from pathlib import Path
 from typing import List, Dict, Any, Optional
@@ -22,7 +21,7 @@ DATA_DIR: Path = Path("data")
 # Time scaling: 1 demo second = 100 real-world hour for cost projection
 REAL_HOURS_PER_DEMO_SECOND: float = 100.0
 # Fixed fee for human cost
-HUMAN_FIXED_FEE_PER_RUN: float = 3.0
+HUMAN_FIXED_FEE_PER_RUN: float = 5.0
 # Cost model adjusted for enterprise-scale AP processing
 COST_PER_HOUR_HUMAN: float = 25.0  
 COST_PER_HOUR_MACHINE: float = 0.50
@@ -196,19 +195,17 @@ def main() -> None:
     # --- Run Baseline ---
     print(f"\nRunning BASELINE process for {len(invoice_paths)} invoices...")
     for path in invoice_paths:
-        ts_start: float = time.perf_counter()
         result: ProcessingResult = run_baseline_process(path, REAL_HOURS_PER_DEMO_SECOND)
-        ts_end: float = time.perf_counter()
 
-        cycle_time: float = ts_end - ts_start
+        cycle_time: float = result["simulated_cycle_time_s"]
         cost: float = calculate_cost("baseline", cycle_time)
         
         log_run(
             run_id=str(uuid.uuid4()),
             run_type="baseline",
             invoice_id=result["invoice_id"],
-            ts_start=ts_start,
-            ts_end=ts_end,
+            ts_start=0.0,
+            ts_end=cycle_time,
             cycle_time_s=cycle_time,
             cost_usd=cost,
             status=result["status"],
@@ -220,19 +217,17 @@ def main() -> None:
     # --- Run Kognitos ---
     print(f"\nRunning KOGNITOS process for {len(invoice_paths)} invoices...")
     for path in invoice_paths:
-        ts_start = time.perf_counter()
         result = run_kognitos_process(path, REAL_HOURS_PER_DEMO_SECOND)
-        ts_end = time.perf_counter()
 
-        cycle_time = ts_end - ts_start
+        cycle_time = result["simulated_cycle_time_s"]
         cost = calculate_cost("kognitos", cycle_time)
 
         log_run(
             run_id=str(uuid.uuid4()),
             run_type="kognitos",
             invoice_id=result["invoice_id"],
-            ts_start=ts_start,
-            ts_end=ts_end,
+            ts_start=0.0,
+            ts_end=cycle_time,
             cycle_time_s=cycle_time,
             cost_usd=cost,
             status=result["status"],

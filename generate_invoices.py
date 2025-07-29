@@ -11,7 +11,7 @@ from typing import Dict, Any, List, Optional
 
 # --- Configuration ---
 TOTAL_INVOICES: int = 1000
-MONSTER_INVOICE_PERCENTAGE: float = 0.15  # 15% of invoices will be monsters
+MONSTER_INVOICE_PERCENTAGE: float = 0.15  # 50% of invoices will be monsters
 DATA_DIR: Path = Path("data")
 VENDORS: List[str] = ["Stark Industries", "Wayne Enterprises", "Cyberdyne Systems", "Acme Corp", "Soylent Corp"]
 
