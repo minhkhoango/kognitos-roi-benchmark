@@ -12,15 +12,16 @@ from typing import Dict, Any, List, Optional, TypedDict
 from src.auditing import compute_merkle_root
 
 # --- Configuration Constants ---
-# Manual process timing (in minutes) following industry average of 12 minutes a manual invoice
-MANUAL_SLEEP_MIN: float = 8.0
-MANUAL_SLEEP_MAX: float = 16.0
+# Manual process timing (in minutes) following industry average of 12 minutes a manual invoice, 
+# account for script loading time
+MANUAL_SLEEP_MIN: float = 6.0
+MANUAL_SLEEP_MAX: float = 14.0
 # Manual process error rate (human error rate 1.6-3%, up to 10-15% possible)
 MANUAL_ERROR_RATE: float = 0.07
 
 # Kognitos process timing (in minutes)
-KOGNITOS_SLEEP_MIN: float = 0.8
-KOGNITOS_SLEEP_MAX: float = 1.6
+KOGNITOS_SLEEP_MIN: float = 0.6
+KOGNITOS_SLEEP_MAX: float = 1.5
 # Kognitos process error rate (automation error rate ~0.5% or less)
 KOGNITOS_ERROR_RATE: float = 0.005
 
@@ -41,7 +42,6 @@ def set_random_seed(seed: Optional[int] = None) -> None:
     _random_seed = seed
     if seed is not None:
         random.seed(seed)
-        print(f"Random seed set to {seed} for reproducible results")
 
 # Initialize seed if specified
 set_random_seed(_random_seed)

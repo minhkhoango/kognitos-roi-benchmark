@@ -30,7 +30,6 @@ def set_random_seed(seed: Optional[int] = None) -> None:
     _random_seed = seed
     if seed is not None:
         random.seed(seed)
-        print(f"Random seed set to {seed} for reproducible invoice generation")
 
 # Initialize seed
 set_random_seed(_random_seed)

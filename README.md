@@ -1,4 +1,4 @@
-# Kognitos ROI Demo: 60.0% Cost Reduction, 83.9% Faster Processing
+# Kognitos ROI Demo: 62.8% Cost Reduction, 73.1% Faster Processing
 
 ## 🚀 Run the Demo
 
@@ -11,12 +11,12 @@ make demo
 | Metric                             | Baseline   | Kognitos   | Improvement |
 |-----------------------------------|------------|------------|-------------|
 | **🚨 Error Rate**                  | 9.9%       | 2.7%       | **72.7%**   |
-| **Cost per Invoice**               | $7.55      | $3.02      | **60.0%**   |
-| **Processing Time**                | 13.31 mins | 2.15 mins  | **83.9%**   |
+| **Cost per Invoice**               | $8.15      | $3.03      | **62,8%**   |
+| **Processing Time**                | 12.35 mins | 3.32 mins  | **73.1%**   |
 | **End-to-end Cycle Time (days)**   | 10.0       | 3.5        | **65.0%**   |
 | **Data Quality/Extraction Errors (%)** | 8.8%      | 2.1%       | **76.1%**   |
 | **Operational/System Errors (%)**  | 1.1%       | 0.6%       | **45.5%**   |
-| **Annual Savings**                 | -          | $29.0M (see report) | $29.0M |
+| **Annual Savings**                 | -          | $30.1M (see report) | $30.1M |
 
 ## 💰 The Business Case
 
@@ -24,8 +24,8 @@ make demo
 
 • **🚨 $25.2M annual error cost avoidance** ($350 avg per error)  
 • **72.7% fewer errors** with self-healing workflows  
-• **60.0% cost reduction** with consumption-based pricing  
-• **83.9% faster processing** with neurosymbolic AI
+• **62.8% cost reduction** with consumption-based pricing  
+• **73.1% faster processing** with neurosymbolic AI
 • **Zero hallucinations** – verifiable results for increased trust and compliance.  
 • **Tamper-proof audit trails** for bulletproof governance.  
 

@@ -22,7 +22,7 @@ DATA_DIR: Path = Path("data")
 # Time scaling: 1 demo second = 100 real-world hour for cost projection
 REAL_HOURS_PER_DEMO_SECOND: float = 100.0
 # Fixed fee for human cost
-HUMAN_FIXED_FEE_PER_RUN: float = 2.0
+HUMAN_FIXED_FEE_PER_RUN: float = 3.0
 # Cost model adjusted for enterprise-scale AP processing
 COST_PER_HOUR_HUMAN: float = 25.0  
 COST_PER_HOUR_MACHINE: float = 0.50
@@ -32,6 +32,11 @@ KOGNITOS_FIXED_FEE_PER_RUN: float = 3.0
 ANNUAL_INVOICES: int = 1000000
 # Error cost impact (assuming $350 average cost per error - typical range $250-500)
 ERROR_COST_PER_INCIDENT: float = 350.0
+
+# Dynamic TCO Calculation (Placeholder: needs real pricing in production)
+BASE_ANNUAL_PLATFORM_FEE: float = 120_000.0  # Example base platform fee
+PER_INVOICE_SUPPORT_FEE: float = 0.4  # Example additional cost per invoice for support/licensing
+DISCOUNT_FACTOR_FOR_VOLUME: float = 0.6 # 40% discount
 
 # --- Random Seed Configuration ---
 # Set to None for non-reproducible results, or an integer for reproducible results
@@ -109,15 +114,6 @@ def print_results(df: pd.DataFrame) -> None:
     else:
         error_delta = -100.0 if kognitos.get("Error Rate (%)", 0) == 0 else 0.0
 
-    # Calculate specific error type deltas
-    baseline_data_error = baseline.get("Data Quality/Extraction Errors (%)", 0)
-    kognitos_data_error = kognitos.get("Data Quality/Extraction Errors (%)", 0)
-    data_error_delta = ((kognitos_data_error - baseline_data_error) / baseline_data_error) * 100 if baseline_data_error > 0 else (-100.0 if kognitos_data_error == 0 else 0.0)
-
-    baseline_payment_error = baseline.get("Operational/System Errors (%)", 0)
-    kognitos_payment_error = kognitos.get("Operational/System Errors (%)", 0)
-    payment_error_delta = ((kognitos_payment_error - baseline_payment_error) / baseline_payment_error) * 100 if baseline_payment_error > 0 else (-100.0 if kognitos_payment_error == 0 else 0.0)
-
     # Calculate business impact metrics
     baseline_cost_per_invoice = baseline.get("Avg Cost ($)", 0)
     kognitos_cost_per_invoice = kognitos.get("Avg Cost ($)", 0)
@@ -129,11 +125,9 @@ def print_results(df: pd.DataFrame) -> None:
     baseline_annual_error_cost = (baseline.get("Error Rate (%)", 0) / 100) * ANNUAL_INVOICES * ERROR_COST_PER_INCIDENT
     kognitos_annual_error_cost = (kognitos.get("Error Rate (%)", 0) / 100) * ANNUAL_INVOICES * ERROR_COST_PER_INCIDENT
     annual_error_cost_savings = baseline_annual_error_cost - kognitos_annual_error_cost
-    
-    # Dynamic TCO Calculation (Placeholder: needs real pricing in production)
-    BASE_ANNUAL_PLATFORM_FEE: float = 250_000.0  # Example base platform fee
-    PER_INVOICE_SUPPORT_FEE: float = 0.50  # Example additional cost per invoice for support/licensing
-    dynamic_annual_platform_support_cost: float = BASE_ANNUAL_PLATFORM_FEE + (ANNUAL_INVOICES * PER_INVOICE_SUPPORT_FEE)
+
+    dynamic_annual_platform_support_cost: float = max(
+        BASE_ANNUAL_PLATFORM_FEE,  (ANNUAL_INVOICES * PER_INVOICE_SUPPORT_FEE * DISCOUNT_FACTOR_FOR_VOLUME))
     # Total annual savings
     total_annual_savings = annual_cost_savings + annual_error_cost_savings - dynamic_annual_platform_support_cost
 
@@ -148,67 +142,41 @@ def print_results(df: pd.DataFrame) -> None:
     print(f"• {abs(error_delta):.1f}% fewer processing errors")
     print(f"• {abs(cost_delta):.1f}% reduction in processing costs")
     print(f"• {abs(time_delta):.1f}% faster processing time")
-    print(f"• ${total_annual_savings / 1_000_000:.1f}M potential net annual benefit (after TCO, assuming 40-50% FTE redeployment & early-pay discounts) for large enterprise")
-    print(f"• {annual_time_savings_hours:.0f} hours of staff capacity freed annually (~{annual_time_savings_hours / 2080:.0f} FTEs for higher-value work)")
+    print(f"• ${total_annual_savings / 1_000_000:.1f}M potential net annual benefit")
+    print(f"• {annual_time_savings_hours:.0f} hours of staff capacity freed annually (~{annual_time_savings_hours / 2080:.0f} FTEs)")
 
-    print("\n💰 BUSINESS IMPACT SUMMARY")
+    print("\n💰 BUSINESS IMPACT")
     print("-" * 40)
     print(f"  • ERROR COST AVOIDANCE: ${annual_error_cost_savings:,.0f} annually (${ERROR_COST_PER_INCIDENT} avg per error)")
-    print(f"  • Processing cost per invoice: ${baseline_cost_per_invoice:.2f} (Manual Baseline) → ${kognitos_cost_per_invoice:.2f} (Automated Best-in-Class)")
+    print(f"  • Processing cost per invoice: ${baseline_cost_per_invoice:.2f} (Manual) → ${kognitos_cost_per_invoice:.2f} (Automated)")
     print(f"  • Annual processing savings: ${annual_cost_savings:,.0f}")
-    print(f"  • Annual platform & support cost: ${dynamic_annual_platform_support_cost / 1_000_000:.1f}M (assumes SaaS license & implementation amortized)")
-    print("\n🚨 CRITICAL RISK MITIGATION:")
-    print(f"  • ERROR COST AVOIDANCE: ${annual_error_cost_savings / 1_000_000:.1f}M annually - the biggest impact")
-    print(f"  • Error rate reduction: {baseline.get('Error Rate (%)', 0):.1f}% → {kognitos.get('Error Rate (%)', 0):.1f}% ({abs(error_delta):.1f}% reduction)")
-    print(f"  • Industry benchmark: Manual AP errors typically cost $250-500 each (rework, compliance fines, audit costs)")
-    print(f"  • Compliance risk mitigation via tamper-proof audit trails (Merkle Roots), reducing fraud risk & audit costs.")
-    print("\nOPERATIONAL EFFICIENCY:")
-    print(f"  • Staff capacity freed: {annual_time_savings_hours:.0f} hours (~{annual_time_savings_hours / 2080:.0f} FTEs for higher-value work; APQC top-quartile retains ≈0.6 FTE per 10K invoices).")
-    print(f"  • Self-healing workflows reduce manual exceptions, ensuring higher straight-through processing (STP) rates.")
-    print(f"  • Scalability: Ability to handle rapid volume spikes (e.g., quarter-end) without proportional headcount increases.")
-    print(f"  • English-as-Code enables business users to quickly adapt workflows, reducing IT dependency and accelerating change.")
+    print(f"  • Platform & support cost: ${dynamic_annual_platform_support_cost / 1_000_000:.2f}M")
+
     print("\nCYCLE TIME IMPACT:")
-    baseline_calendar_days: float = 10.0  # Industry benchmark: typical end-to-end AP cycle time (includes queuing, approvals, exceptions, not just touch time)
-    kognitos_calendar_days: float = 3.5  # Industry benchmark: realistic automated end-to-end AP cycle time for best-in-class operations
+    baseline_calendar_days: float = 10.0
+    kognitos_calendar_days: float = 3.5
     calendar_days_delta: float = ((kognitos_calendar_days - baseline_calendar_days) / baseline_calendar_days) * 100
-    print(f"  • Overall process cycle time (receipt-to-pay): {baseline_calendar_days:.1f} days → {kognitos_calendar_days:.1f} days ({abs(calendar_days_delta):.1f}% faster), reflecting reductions in touch time, queuing, and exceptions.")
-    print(f"  • Enables early payment discounts and optimizes Days Payable Outstanding (DPO).")
-    print("\nSENSITIVITY ANALYSIS (Conceptual Scenarios):")
-    print("  • Conservative: Based on lower Kognitos efficiency, higher integration overhead, or conservative FTE redeployment assumptions (e.g., 20% of staff time savings realized).")
-    print("  • Expected: Current demo projections, assuming average operational conditions, with a realistic FTE redeployment (e.g., 40-50% of staff time savings realized) and moderate early-pay discount capture.")
-    print("  • Stretch: Achieved with optimal implementation, high volume, maximum efficiency, aggressive FTE redeployment (e.g., 60-70% of staff time savings realized), and high early-pay discount capture.")
-    print("A detailed sensitivity model accounts for factors like licensing, implementation costs, and comprehensive TCO, providing a tornado-chart view for financial review.")
-    print(f"\n💡 ERROR COST IMPACT BREAKDOWN:")
-    print(f"  • Each processing error costs ${ERROR_COST_PER_INCIDENT} on average (rework, compliance fines, audit costs)")
-    print(f"  • Manual baseline: {baseline.get('Error Rate (%)', 0):.1f}% error rate = {baseline.get('Error Rate (%)', 0) / 100 * ANNUAL_INVOICES:,.0f} errors annually")
-    print(f"  • Kognitos automated: {kognitos.get('Error Rate (%)', 0):.1f}% error rate = {kognitos.get('Error Rate (%)', 0) / 100 * ANNUAL_INVOICES:,.0f} errors annually")
-    print(f"  • Errors avoided: {((baseline.get('Error Rate (%)', 0) - kognitos.get('Error Rate (%)', 0)) / 100 * ANNUAL_INVOICES):,.0f} annually")
-    print(f"  • This represents the largest single source of ROI in AP automation")
+    print(f"  • Cycle time: {baseline_calendar_days:.1f} days → {kognitos_calendar_days:.1f} days ({abs(calendar_days_delta):.1f}% faster)")
+
     print("\nDETAILED PERFORMANCE METRICS:")
-    print("| Metric                             | Baseline   | Kognitos   | Improvement (%) |")
-    print("|------------------------------------|------------|------------|-----------------|")
+    print("| Metric                   | Baseline   | Kognitos   | Improvement (%) |")
+    print("|--------------------------|------------|------------|-----------------|")
     baseline_mins: float = baseline.get("Avg Cycle Time (s)", 0) * REAL_HOURS_PER_DEMO_SECOND * 60.0
     kognitos_mins: float = kognitos.get("Avg Cycle Time (s)", 0) * REAL_HOURS_PER_DEMO_SECOND * 60.0
-    print(f"| Processing Time (mins)             | {baseline_mins:<10.2f} | {kognitos_mins:<10.2f} | {abs(time_delta):<15.1f} |")
-    print(f"| End-to-end Cycle Time (days)       | {baseline_calendar_days:<10.1f} | {kognitos_calendar_days:<10.1f} | {abs(calendar_days_delta):<15.1f} |")
-    print(f"| Cost per Invoice ($)               | {baseline_cost_per_invoice:<10.2f} | {kognitos_cost_per_invoice:<10.2f} | {abs(cost_delta):<15.1f} |")
-    print(f"| Overall Error Rate (%)             | {baseline.get('Error Rate (%)', 0):<10.1f} | {kognitos.get('Error Rate (%)', 0):<10.1f} | {abs(error_delta):<15.1f} |")
-    print(f"| Data Quality/Extraction Errors (%) | {baseline.get('Data Quality/Extraction Errors (%)', 0):<10.1f} | {kognitos.get('Data Quality/Extraction Errors (%)', 0):<10.1f} | {abs(data_error_delta):<15.1f} |")
-    print(f"| Operational/System Errors (%)      | {baseline.get('Operational/System Errors (%)', 0):<10.1f} | {kognitos.get('Operational/System Errors (%)', 0):<10.1f} | {abs(payment_error_delta):<15.1f} |")
-    print("\n📋 NET ANNUAL PROJECTIONS (for {:,.0f} invoices per year, after TCO)".format(ANNUAL_INVOICES))
-    print(f"🚨 ERROR COST AVOIDANCE:     ${annual_error_cost_savings / 1_000_000:>10,.1f}M  ← BIGGEST IMPACT")
-    print(f"Processing Cost Savings:     ${annual_cost_savings / 1_000_000:>10,.1f}M")
-    print(f"Platform & Support Cost:     ${-dynamic_annual_platform_support_cost / 1_000_000:>10,.1f}M")
-    print(f"TOTAL NET ANNUAL SAVINGS:    ${total_annual_savings / 1_000_000:>10,.1f}M")
-    print("\n💡 NEXT STEPS")
-    print("-" * 40)
-    print(f"1. **Pilot on 10K live invoices** → Validate up to ~${total_annual_savings / 1_000_000:.1f}M net benefit for your specific operations")
-    print("2. Review cryptographic audit trail in database")
-    print("3. Customize English-as-code workflows for your use case")
-    print("4. Scale to production with consumption-based pricing")
-    print("5. Deploy across additional business processes")
+    print(f"| Processing Time (mins)   | {baseline_mins:<10.2f} | {kognitos_mins:<10.2f} | {abs(time_delta):<15.1f} |")
+    print(f"| Cycle Time (days)        | {baseline_calendar_days:<10.1f} | {kognitos_calendar_days:<10.1f} | {abs(calendar_days_delta):<15.1f} |")
+    print(f"| Cost per Invoice ($)     | {baseline_cost_per_invoice:<10.2f} | {kognitos_cost_per_invoice:<10.2f} | {abs(cost_delta):<15.1f} |")
+    print(f"| Error Rate (%)           | {baseline.get('Error Rate (%)', 0):<10.1f} | {kognitos.get('Error Rate (%)', 0):<10.1f} | {abs(error_delta):<15.1f} |")
+
+    print("\n📋 NET ANNUAL PROJECTIONS (for {:,.0f} invoices per year)".format(ANNUAL_INVOICES))
+    print(f"ERROR COST AVOIDANCE:     ${annual_error_cost_savings / 1_000_000:>10,.1f}M")
+    print(f"Processing Cost Savings:  ${annual_cost_savings / 1_000_000:>10,.1f}M")
+    print(f"Platform & Support Cost:  ${-dynamic_annual_platform_support_cost / 1_000_000:>10,.1f}M")
+    print(f"TOTAL NET ANNUAL SAVINGS: ${total_annual_savings / 1_000_000:>10,.1f}M")
+
+    print("\nNEXT STEPS: Pilot on 10K live invoices, review audit trail, customize workflows, scale to production.")
     print("\n" + "="*80)
-    print("✅ REPORT COMPLETE - Ready to transform your AP operations")
+    print("✅ REPORT COMPLETE")
     print("="*80 + "\n")
 
 def main() -> None:
